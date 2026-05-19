@@ -23,7 +23,6 @@ ages = np.clip(ages, 18, 80)
 purchase_amounts = np.random.exponential(scale=2500, size=N)
 purchase_amounts = np.clip(purchase_amounts, 50, 50000)
 
-# Inject outliers
 outlier_idx = np.random.choice(N, size=30, replace=False)
 purchase_amounts[outlier_idx] = np.random.uniform(80000, 200000, size=30)
 
@@ -46,18 +45,15 @@ df = pd.DataFrame({
     'returned':           np.random.choice([True, False], N, p=[0.12, 0.88]),
 })
 
-# ── inject missing values ────────────────────────────────────────────────
 for col, frac in [('age', 0.06), ('rating', 0.09), ('purchase_amount', 0.04),
                    ('gender', 0.03), ('city', 0.02)]:
     miss_idx = np.random.choice(N, size=int(N * frac), replace=False)
     df.loc[miss_idx, col] = np.nan
 
-# ── inject duplicates (≈4 %) ─────────────────────────────────────────────
 dup_rows = df.sample(frac=0.04, random_state=7)
 df = pd.concat([df, dup_rows], ignore_index=True)
 df = df.sample(frac=1, random_state=99).reset_index(drop=True)
 
-# ── inject data-type noise ───────────────────────────────────────────────
 bad_idx = np.random.choice(len(df), size=15, replace=False)
 df['age'] = df['age'].astype(object)
 df.loc[bad_idx, 'age'] = 'unknown'
